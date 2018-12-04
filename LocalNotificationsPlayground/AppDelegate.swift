@@ -3,7 +3,7 @@ import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    
     var window: UIWindow?
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
@@ -50,6 +50,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         content.sound = .default
         #endif
         
+        content.userInfo = [
+            "custom key 1": "custom value 1",
+            "custom key 2": "custom value 2",
+            "custom key 3": "custom value 3"
+        ]
+        
         let date = Date(timeInterval: 5, since: Date())
         let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
@@ -76,9 +82,15 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         print(">> userNotificationCenter:willPresentNotification")
         
         #if os(tvOS)
+        
         completionHandler(.badge)
+        
         #else
         completionHandler([.alert, .sound, .badge])
+        
+        let userInfo = notification.request.content.userInfo
+        print("UserInfo: \(userInfo)")
+        
         #endif
     }
     
@@ -86,6 +98,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
         print(">> userNotificationCenter: didReceiveResponse")
+        
+        let userInfo = response.notification.request.content.userInfo
+        print("UserInfo: \(userInfo)")
         
         completionHandler()
     }
